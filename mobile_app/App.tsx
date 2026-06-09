@@ -32,14 +32,7 @@ type AppTab = 'scanner' | 'manual' | 'chat';
 
 export default function App() {
   // Server config
-  const [serverIp, setServerIp] = useState('chloroguard-backend.onrender.com');
-  const [serverPort, setServerPort] = useState('');
-  
-  const getApiBaseUrl = () => {
-    if (serverIp.includes('render.com')) return `https://${serverIp.trim()}`;
-    return `http://${serverIp.trim()}:${serverPort.trim()}`;
-  };
-  const [showSettings, setShowSettings] = useState(false);
+  const getApiBaseUrl = () => `https://chloroguard-backend.onrender.com`;
   const [connectionStatus, setConnectionStatus] = useState<'idle'|'checking'|'connected'|'failed'>('idle');
 
   // Scanner
@@ -69,8 +62,7 @@ export default function App() {
   const [chatLoading, setChatLoading] = useState(false);
   const chatScrollRef = useRef<FlatList>(null);
 
-  const getApiBaseUrl = () => `http://${serverIp.trim()}:${serverPort.trim()}`;
-
+  // Duplicate removed
   // Get scan context to send to AI
   const getScanContext = () => {
     if (prediction) return `${prediction.crop} — ${prediction.disease_name} detected at ${(prediction.confidence * 100).toFixed(1)}% confidence`;
@@ -262,34 +254,7 @@ export default function App() {
             <Text style={s.headerTitle}>CHLOROGUARD</Text>
             <Text style={s.headerSub}>Plant Disease Intelligence System</Text>
           </View>
-          <TouchableOpacity style={s.settingsBtn} onPress={() => setShowSettings(!showSettings)}>
-            <Text style={{ fontSize: 18 }}>⚙️</Text>
-          </TouchableOpacity>
         </View>
-
-        {/* ── Settings ───────────────────────────────────────── */}
-        {showSettings && (
-          <View style={s.settingsCard}>
-            <Text style={s.settingsTitle}>Connection Settings</Text>
-            <View style={s.inputRow}>
-              <View style={{ flex: 2, marginRight: 8 }}>
-                <Text style={s.label}>Server IP</Text>
-                <TextInput style={s.input} value={serverIp} onChangeText={v => { setServerIp(v); setConnectionStatus('idle'); }} placeholder="192.168.x.x" placeholderTextColor="#2d4d33" keyboardType="decimal-pad" />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={s.label}>Port</Text>
-                <TextInput style={s.input} value={serverPort} onChangeText={v => { setServerPort(v); setConnectionStatus('idle'); }} placeholder="8000" placeholderTextColor="#2d4d33" keyboardType="numeric" />
-              </View>
-            </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              {connectionStatus === 'connected' && <View style={[s.badge, { backgroundColor: 'rgba(134,239,172,0.1)', borderColor: '#166534' }]}><Text style={[s.badgeText, { color: '#86efac' }]}>● Connected</Text></View>}
-              {connectionStatus === 'failed' && <View style={[s.badge, { backgroundColor: 'rgba(239,68,68,0.1)', borderColor: '#991b1b' }]}><Text style={[s.badgeText, { color: '#fca5a5' }]}>● Offline</Text></View>}
-              {connectionStatus === 'checking' && <View style={[s.badge, { backgroundColor: 'rgba(245,158,11,0.1)', borderColor: '#92400e' }]}><ActivityIndicator size="small" color="#fbbf24" /><Text style={[s.badgeText, { color: '#fbbf24', marginLeft: 4 }]}>Connecting...</Text></View>}
-              {connectionStatus === 'idle' && <View />}
-              <TouchableOpacity style={s.testBtn} onPress={() => checkConnection()}><Text style={s.testBtnText}>Test & Connect</Text></TouchableOpacity>
-            </View>
-          </View>
-        )}
 
         {/* ── Tab Bar ────────────────────────────────────────── */}
         <View style={s.appTabBar}>
