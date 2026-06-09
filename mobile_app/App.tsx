@@ -70,30 +70,19 @@ export default function App() {
     return null;
   };
 
-  const checkConnection = async (silent = false) => {
-    if (!silent) setConnectionStatus('checking');
-    try {
-      const controller = new AbortController();
-      const t = setTimeout(() => controller.abort(), 4000);
-      const res = await fetch(`${getApiBaseUrl()}/`, { signal: controller.signal });
-      clearTimeout(t);
-      if (res.ok && (await res.json()).status === 'online') {
-        setConnectionStatus('connected');
-        fetchMetadata();
-        return true;
-      }
-      setConnectionStatus('failed'); return false;
-    } catch { setConnectionStatus('failed'); return false; }
-  };
-
   const fetchMetadata = async () => {
     try {
       const res = await fetch(`${getApiBaseUrl()}/metadata`);
-      if (res.ok) setMetadata(await res.json());
+      if (res.ok) {
+        setMetadata(await res.json());
+      }
     } catch {}
   };
 
-  useEffect(() => { checkConnection(true); }, []);
+  useEffect(() => { 
+    // Fetch metadata on startup. This silently wakes up the Render server in the background!
+    fetchMetadata(); 
+  }, []);
 
   // ── Image picker helpers ─────────────────────────────────────────
   const takePhoto = async () => {
@@ -502,7 +491,7 @@ export default function App() {
                   <Text style={[s.modalItemText, selectedCrop === crop && s.activeModalItemText]}>{crop}</Text>
                   {selectedCrop === crop && <Text style={{ color: '#86efac', fontWeight: '800' }}>✓</Text>}
                 </TouchableOpacity>
-              )) : <Text style={s.modalEmpty}>Server not connected.</Text>}
+              )) : <Text style={s.modalEmpty}>Loading crops from cloud server... (This may take up to 60s if the server is waking up)</Text>}
             </ScrollView>
           </View>
         </View>
