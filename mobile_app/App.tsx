@@ -143,10 +143,6 @@ export default function App() {
   const sendChat = async (messageText?: string) => {
     const text = (messageText || chatInput).trim();
     if (!text) return;
-    if (connectionStatus !== 'connected') {
-      Alert.alert('Not Connected', 'Connect to your backend server first (tap ⚙️ and Test & Connect).'); return;
-    }
-
     const userMsg: ChatMessage = { id: Date.now().toString(), role: 'user', text, timestamp: new Date() };
     setChatMessages(prev => [...prev, userMsg]);
     setChatInput('');
