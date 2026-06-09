@@ -19,7 +19,10 @@
         "backgroundColor": "#0e1a0f"
       },
       "package": "com.chloroguard.app",
-      "softwareKeyboardLayoutMode": "resize"
+      "softwareKeyboardLayoutMode": "resize",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       [
@@ -29,6 +32,11 @@
           "cameraPermission": "Allow ChloroGuard to use the camera to take pictures of crop leaves."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6106c584-ebe6-485b-9434-5208fb88da67"
+      }
+    }
   }
 }
