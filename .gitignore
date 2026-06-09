@@ -1,0 +1,11 @@
+# Ignore the backend API repository (it has its own GitHub repo)
+api/
+
+# Node modules
+node_modules/
+mobile_app/node_modules/
+mobile_app/.expo/
+
+# OS files
+.DS_Store
+Thumbs.db

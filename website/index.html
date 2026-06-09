@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>photoguard — Leaf Disease Prediction & Plant Health System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="glass-bg"></div>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fa-solid fa-leaf leaf-logo-icon"></i>
+                <span class="logo-text">photo<span class="accent-text">guard</span></span>
+            </div>
+            <nav class="header-nav">
+                <span class="system-status" id="systemStatus">
+                    <span class="status-dot"></span> API: Checking...
+                </span>
+            </nav>
+        </div>
+    </header>
+
+    <main class="app-container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1 class="hero-title">Intelligent <span class="gradient-text">Leaf Disease</span> Diagnosis</h1>
+            <p class="hero-subtitle">Upload leaf photos to instantly verify agricultural plants, classify 38 crop-disease states, and unlock organic & chemical remedies.</p>
+        </section>
+
+        <div class="dashboard-grid">
+            <!-- Left Panel: Actions & Inputs -->
+            <div class="panel-left">
+                <!-- Dropzone Card -->
+                <div class="dashboard-card upload-card" id="uploadCard">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fa-solid fa-cloud-arrow-up"></i> Analyze Image</h2>
+                    </div>
+                    
+                    <div class="drop-zone" id="dropZone">
+                        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" style="display: none;">
+                        <div class="drop-zone-content" id="dropZoneContent">
+                            <div class="pulse-icon-container">
+                                <i class="fa-solid fa-circle-nodes upload-icon"></i>
+                            </div>
+                            <h3>Drag & Drop Leaf Photo</h3>
+                            <p>or click to browse local files</p>
+                            <span class="file-limits">Supports JPG, PNG, WEBP (Max 10MB)</span>
+                        </div>
+                        <div class="preview-container" id="previewContainer" style="display: none;">
+                            <img id="imagePreview" src="" alt="Selected leaf preview">
+                            <div class="preview-overlay">
+                                <button class="btn btn-secondary btn-sm" id="btnChangeImage" type="button">
+                                    <i class="fa-solid fa-rotate"></i> Change Image
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-block btn-lg" id="btnAnalyze" disabled>
+                        <span id="btnText"><i class="fa-solid fa-magnifying-glass"></i> Start Diagnosis</span>
+                        <span id="spinner" class="spinner" style="display: none;"></span>
+                    </button>
+                </div>
+
+                <!-- Manual Trigger Banner -->
+                <div class="manual-trigger-card">
+                    <p>Can't take a photo? Or did automatic detection fail?</p>
+                    <button class="btn btn-outline btn-block" id="btnOpenManual" type="button">
+                        <i class="fa-solid fa-keyboard"></i> Manual Entry Mode
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Panel: Diagnostics & Reports -->
+            <div class="panel-right">
+                <!-- Idle State -->
+                <div class="dashboard-card idle-card" id="idleCard">
+                    <i class="fa-solid fa-seedling idle-icon"></i>
+                    <h3>Awaiting Diagnosis</h3>
+                    <p>Upload a clear photo of the leaf or use Manual Entry to view real-time crop analysis, disease predictions, and treatment recommendations.</p>
+                </div>
+
+                <!-- Loading State Card -->
+                <div class="dashboard-card loading-card" id="loadingCard" style="display: none;">
+                    <div class="scanner-container">
+                        <div class="scanner-line"></div>
+                        <img id="scannerPreview" src="" alt="Scanning...">
+                    </div>
+                    <h3>Scanning Foliage...</h3>
+                    <p id="loadingStatusText">Extracting color features & running deep learning classification...</p>
+                </div>
+
+                <!-- Result Card -->
+                <div class="dashboard-card result-card" id="resultCard" style="display: none;">
+                    <div class="result-header">
+                        <div>
+                            <span class="crop-badge" id="resCropName">Tomato</span>
+                            <h2 class="disease-title" id="resDiseaseName">Septoria Leaf Spot</h2>
+                        </div>
+                        <div class="severity-badge-container">
+                            <span class="severity-badge" id="resSeverity">Medium Severity</span>
+                        </div>
+                    </div>
+
+                    <div class="confidence-section">
+                        <div class="confidence-meta">
+                            <span>Diagnostic Confidence</span>
+                            <span class="confidence-value" id="resConfidence">94.8%</span>
+                        </div>
+                        <div class="confidence-bar-wrapper">
+                            <div class="confidence-bar" id="resConfidenceBar" style="width: 94.8%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Report Content Tabs -->
+                    <div class="report-tabs">
+                        <button class="tab-btn active" data-tab="organic" id="tabOrganicBtn">
+                            <i class="fa-solid fa-leaf"></i> Organic Remedies
+                        </button>
+                        <button class="tab-btn" data-tab="chemical" id="tabChemicalBtn">
+                            <i class="fa-solid fa-flask"></i> Chemical Treatments
+                        </button>
+                        <button class="tab-btn" data-tab="prevention" id="tabPreventionBtn">
+                            <i class="fa-solid fa-shield-halved"></i> Prevention
+                        </button>
+                    </div>
+
+                    <div class="tab-content-container">
+                        <div class="tab-pane active" id="tabOrganic">
+                            <ul class="remedy-list" id="organicList">
+                                <!-- Populated dynamically -->
+                            </ul>
+                        </div>
+                        <div class="tab-pane" id="tabChemical">
+                            <ul class="remedy-list" id="chemicalList">
+                                <!-- Populated dynamically -->
+                            </ul>
+                        </div>
+                        <div class="tab-pane" id="tabPrevention">
+                            <ul class="remedy-list" id="preventionList">
+                                <!-- Populated dynamically -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="result-footer">
+                        <p class="verification-meta" id="resLeafMeta"><i class="fa-solid fa-circle-check"></i> Verified Agricultural Leaf (84.2% leaf profile)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal: Manual Entry Form -->
+    <div class="modal-overlay" id="manualModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-keyboard"></i> Manual Diagnosis Entry</h3>
+                <button class="close-modal-btn" id="btnCloseManualModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">Select the agricultural crop and the observed symptoms or disease manually to pull recommendations from our database.</p>
+                <form id="manualDiagnosisForm">
+                    <div class="form-group">
+                        <label for="manualCropSelect">Select Crop Plant</label>
+                        <select id="manualCropSelect" required>
+                            <option value="" disabled selected>Choose a crop...</option>
+                            <!-- Dynamically loaded -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="manualDiseaseSelect">Select Observed Disease / State</label>
+                        <select id="manualDiseaseSelect" required disabled>
+                            <option value="" disabled selected>Choose symptoms...</option>
+                            <!-- Dynamically loaded based on crop selection -->
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-block" type="submit" id="btnManualSubmit">
+                        <i class="fa-solid fa-file-invoice"></i> Generate Remedy Report
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Safety Filter Alert (Not agricultural leaf) -->
+    <div class="modal-overlay" id="safetyAlertModal">
+        <div class="modal-card warning-modal">
+            <div class="modal-header">
+                <h3 class="warning-title"><i class="fa-solid fa-circle-exclamation"></i> Safety Filter Triggered</h3>
+                <button class="close-modal-btn" id="btnCloseSafetyModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="warning-graphic">
+                    <i class="fa-solid fa-eye-slash warning-icon"></i>
+                </div>
+                <h4>Not Identified as Agricultural Foliage</h4>
+                <p id="safetyAlertMessage">We could not reliably identify a leaf from our 14 supported agricultural crops in this image. (Confidence was too low or non-leaf features were detected).</p>
+                
+                <div class="warning-details" id="safetyDetailsBox">
+                    <p><strong>Reasoning:</strong> <span id="safetyReason">Leaf pigment ratio too low (3.2%)</span></p>
+                    <p><strong>Inference Guess:</strong> <span id="safetyGuess">Tomato Mosaic Virus (24.1% confidence)</span></p>
+                </div>
+
+                <div class="warning-actions">
+                    <button class="btn btn-warning btn-block" id="btnForceAccept">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Keep Auto-Prediction Anyway
+                    </button>
+                    <button class="btn btn-secondary btn-block" id="btnProceedManual">
+                        <i class="fa-solid fa-keyboard"></i> Enter Details Manually
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 photoguard AI. Powered by fine-tuned MobileNetV2 (95.4% Accuracy on 38 plant disease classes).</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

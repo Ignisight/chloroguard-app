@@ -1,0 +1,5 @@
+gradio>=4.0.0
+pillow==11.3.0
+numpy==2.3.5
+transformers==5.0.0
+torch==2.11.0.dev20260126+cpu
